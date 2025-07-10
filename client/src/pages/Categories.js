@@ -205,15 +205,24 @@ const Categories = () => {
         ) : (
           <>
             {viewMode === 'grid' ? (
-              <Row>
+              <div className="categories-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '24px',
+                width: '100%',
+                margin: '0 auto',
+                maxWidth: '1200px',
+                padding: '0 16px',
+                overflowX: 'hidden'
+              }}>
                 {categories.map(category => (
-                  <Col lg={3} md={4} sm={6} xs={12} key={category._id} className="mb-4">
+                  <div key={category._id} className="category-card-container">
                     <Card 
                       className="category-card h-100 shadow-sm" 
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', maxWidth: '400px', minWidth: '260px', margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100%' }}
                       onClick={(e) => handleCategoryClick(category, e)}
                     >
-                      <div className="category-image-container">
+                      <div className="category-image-container" style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', overflow: 'hidden', borderRadius: '12px 12px 0 0' }}>
                         <ImageWithFallback
                           src={category.image}
                           alt={category.name}
@@ -263,9 +272,9 @@ const Categories = () => {
                         </div>
                       </Card.Body>
                     </Card>
-                  </Col>
+                  </div>
                 ))}
-              </Row>
+              </div>
             ) : (
               <Card className="shadow-sm">
                 <Card.Body>

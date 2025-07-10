@@ -210,7 +210,16 @@ const Brands = () => {
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <div className="brands-grid">
+            <div className="brands-grid" style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+  gap: '24px',
+  width: '100%',
+  margin: '0 auto',
+  maxWidth: '1200px',
+  padding: '0 16px',
+  overflowX: 'hidden'
+}}>
               {brands.map(brand => (
                 <div key={brand._id} className="brand-card-container">
                   <Card 

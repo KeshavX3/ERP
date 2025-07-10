@@ -103,6 +103,7 @@ const Products = () => {
     try {
       // Process price range filter
       let processedFilters = { ...filters };
+      console.log('DEBUG: Filters sent to backend:', processedFilters);
       
       if (filters.priceRange) {
         const [min, max] = filters.priceRange.split('-');
