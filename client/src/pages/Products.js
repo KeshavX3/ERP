@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Button, Table, Modal, Form, Pagination } from 'react-bootstrap';
+import { Card, Button, Table, Modal, Form, Pagination, Row, Col } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productService from '../services/productService';
@@ -10,6 +10,7 @@ import ProductForm from '../components/ProductForm';
 import ImageWithFallback from '../components/ImageWithFallback';
 
 const Products = () => {
+  // State management
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -19,27 +20,15 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ show: false, product: null });
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pages: 1,
-    total: 0,
-    limit: 12
-  });
+  const [viewMode, setViewMode] = useState('grid');
+  const [pagination, setPagination] = useState({ current: 1, pages: 1, total: 0, limit: 12 });
   const [filters, setFilters] = useState({
-    search: '',
-    category: '',
-    brand: '',
-    priceRange: '',
-    minPrice: '',
-    maxPrice: '',
-    page: 1
+    search: '', category: '', brand: '', priceRange: '', minPrice: '', maxPrice: '', page: 1
   });
-  const [pendingNavigationFilter, setPendingNavigationFilter] = useState(null);
+  
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Price ranges for filter
+  
   const priceRanges = [
     { value: '', label: 'All Prices' },
     { value: '0-300', label: '$0 - $300' },
@@ -47,50 +36,48 @@ const Products = () => {
     { value: '1000-5000', label: '$1,000 - $5,000' },
     { value: '5000-above', label: '$5,000 & Above' }
   ];
-
-  // Handle navigation state from Categories/Brands pages
   useEffect(() => {
+    let shouldUpdateFilters = false;
+    let newFilters = { ...filters };
+
+    // Handle navigation state from Categories/Brands pages (priority)
     if (location.state) {
       const { categoryFilter, brandFilter, categoryName, brandName } = location.state;
-      let newFilters = {};
       if (categoryFilter) {
         newFilters.category = categoryFilter;
+        newFilters.page = 1;
+        shouldUpdateFilters = true;
         toast.info(`Showing products from category: ${categoryName}`);
       }
       if (brandFilter) {
         newFilters.brand = brandFilter;
+        newFilters.page = 1;
+        shouldUpdateFilters = true;
         toast.info(`Showing products from brand: ${brandName}`);
       }
-      if (Object.keys(newFilters).length > 0) {
-        setPendingNavigationFilter(newFilters);
-      } else {
-        navigate(location.pathname, { replace: true, state: null });
+      
+      // Clear navigation state immediately
+      navigate(location.pathname, { replace: true, state: null });
+    } else {
+      // Handle URL parameters if no navigation state
+      const urlParams = new URLSearchParams(location.search);
+      const categoryParam = urlParams.get('category');
+      const brandParam = urlParams.get('brand');
+      
+      if (categoryParam && categoryParam !== filters.category) {
+        newFilters.category = categoryParam;
+        shouldUpdateFilters = true;
+      }
+      if (brandParam && brandParam !== filters.brand) {
+        newFilters.brand = brandParam;
+        shouldUpdateFilters = true;
       }
     }
-  }, [location.state, navigate, location.pathname]);
 
-  useEffect(() => {
-    if (pendingNavigationFilter) {
-      setFilters(prev => ({ ...prev, ...pendingNavigationFilter, page: 1 }));
-      setPendingNavigationFilter(null);
-      navigate(location.pathname, { replace: true, state: null });
+    if (shouldUpdateFilters) {
+      setFilters(newFilters);
     }
-  }, [pendingNavigationFilter, navigate, location.pathname]);
-
-  // Handle URL parameters for category/brand filtering
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const categoryParam = urlParams.get('category');
-    const brandParam = urlParams.get('brand');
-    
-    if (categoryParam || brandParam) {
-      setFilters(prev => ({
-        ...prev,
-        category: categoryParam || '',
-        brand: brandParam || ''
-      }));
-    }
-  }, [location.search]);
+  }, [location.state, location.search, navigate]);
 
   useEffect(() => {
     loadProducts();
@@ -258,27 +245,28 @@ const Products = () => {
 
   return (
     <div className="main-content">
-      {/* Header */}
-      <div className="products-header-section">
-        <div className="header">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-              <h1 className="mb-0">Products</h1>
-              <p className="text-muted mb-0">Manage your product inventory</p>
-            </div>
-            <div className="d-flex gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                <i className="fas fa-th me-1"></i>Grid
-              </Button>
-              <Button
-                variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
-                size="sm"
-                onClick={() => setViewMode('table')}
-              >
+      <div className="page-content">
+        {/* Header */}
+        <div className="products-header-section">
+          <div className="header">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <h1 className="mb-0">Products</h1>
+                <p className="text-muted mb-0">Manage your product inventory</p>
+              </div>
+              <div className="d-flex gap-2">
+                <Button
+                  variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                >
+                  <i className="fas fa-th me-1"></i>Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                >
                 <i className="fas fa-list me-1"></i>Table
               </Button>
               <Button
@@ -293,11 +281,11 @@ const Products = () => {
       </div>
 
       {/* Enhanced Filters */}
-      <div className="filter-section shadow-sm mb-4 mt-3">
+      <div className="filter-section shadow-sm mb-4">
         <Card className="border-0 shadow-sm">
           <Card.Body>
             <Row className="g-3">
-              <Col md={3}>
+              <Col xl={3} lg={3} md={4} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">Search Products</label>
                   <div className="search-box">
@@ -312,7 +300,7 @@ const Products = () => {
                   </div>
                 </div>
               </Col>
-              <Col md={2}>
+              <Col xl={2} lg={2} md={3} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">Category</label>
                   <Form.Select
@@ -329,7 +317,7 @@ const Products = () => {
                   </Form.Select>
                 </div>
               </Col>
-              <Col md={2}>
+              <Col xl={2} lg={2} md={3} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">Brand</label>
                   <Form.Select
@@ -346,7 +334,7 @@ const Products = () => {
                   </Form.Select>
                 </div>
               </Col>
-              <Col md={2}>
+              <Col xl={2} lg={2} md={3} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">Price Range</label>
                   <Form.Select
@@ -362,7 +350,7 @@ const Products = () => {
                   </Form.Select>
                 </div>
               </Col>
-              <Col md={2}>
+              <Col xl={2} lg={2} md={3} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">Items per page</label>
                   <Form.Select
@@ -376,13 +364,13 @@ const Products = () => {
                   </Form.Select>
                 </div>
               </Col>
-              <Col md={1}>
+              <Col xl={1} lg={1} md={2} sm={6} xs={12}>
                 <div className="filter-group">
                   <label className="filter-label">&nbsp;</label>
                   <Button
                     variant="outline-secondary"
                     onClick={clearAllFilters}
-                    className="clear-filters-btn"
+                    className="clear-filters-btn w-100"
                     title="Clear all filters"
                   >
                     <i className="fas fa-times"></i>
@@ -658,6 +646,7 @@ const Products = () => {
             )}
           </>
         )}
+      </div> {/* Close page-content wrapper */}
 
         {/* Modals */}
         <ProductModal
@@ -696,10 +685,11 @@ const Products = () => {
               Delete
             </Button>
           </Modal.Footer>
-        </Modal>
+      </Modal>
       </div>
     </div>
-    );
+
+  );
 };
 
 export default Products;
