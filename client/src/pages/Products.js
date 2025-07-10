@@ -35,6 +35,7 @@ const Products = () => {
     maxPrice: '',
     page: 1
   });
+  const [pendingNavigationFilter, setPendingNavigationFilter] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -61,14 +62,20 @@ const Products = () => {
         toast.info(`Showing products from brand: ${brandName}`);
       }
       if (Object.keys(newFilters).length > 0) {
-        setFilters(prev => ({ ...prev, ...newFilters, page: 1 }));
-        // Clear navigation state immediately so it doesn't re-trigger
-        navigate(location.pathname, { replace: true, state: null });
+        setPendingNavigationFilter(newFilters);
       } else {
         navigate(location.pathname, { replace: true, state: null });
       }
     }
   }, [location.state, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (pendingNavigationFilter) {
+      setFilters(prev => ({ ...prev, ...pendingNavigationFilter, page: 1 }));
+      setPendingNavigationFilter(null);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [pendingNavigationFilter, navigate, location.pathname]);
 
   // Handle URL parameters for category/brand filtering
   useEffect(() => {

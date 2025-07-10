@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form, Badge } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import brandService from '../services/brandService';
 import productService from '../services/productService';
 import ImageWithFallback from '../components/ImageWithFallback';
 
 const Brands = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [brandCounts, setBrandCounts] = useState({});
@@ -21,6 +22,7 @@ const Brands = () => {
     logo: '',
     website: ''
   });
+  const [pendingNavigationFilter, setPendingNavigationFilter] = useState(null);
 
   useEffect(() => {
     loadBrands();
@@ -132,6 +134,32 @@ const Brands = () => {
       [e.target.name]: e.target.value
     });
   };
+
+  // Handle navigation state from Categories/Products pages (cross-page navigation)
+  useEffect(() => {
+    if (location.state) {
+      const { brandFilter, brandName } = location.state;
+      let newFilters = {};
+      if (brandFilter) {
+        newFilters.brand = brandFilter;
+        toast.info(`Showing products from brand: ${brandName}`);
+      }
+      if (Object.keys(newFilters).length > 0) {
+        setPendingNavigationFilter(newFilters);
+      } else {
+        navigate(location.pathname, { replace: true, state: null });
+      }
+    }
+  }, [location.state, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (pendingNavigationFilter) {
+      // If you want to filter brands here, apply the filter logic
+      // For now, just clear navigation state after showing toast
+      setPendingNavigationFilter(null);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [pendingNavigationFilter, navigate, location.pathname]);
 
   return (
     <div className="main-content">
