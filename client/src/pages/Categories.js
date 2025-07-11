@@ -81,19 +81,30 @@ const Categories = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clean up form data - ensure empty strings for optional fields
+    const cleanFormData = {
+      ...formData,
+      description: formData.description || '',
+      image: formData.image || ''
+    };
+    
     try {
+      console.log('Submitting category data:', cleanFormData);
       if (editingCategory) {
-        await categoryService.updateCategory(editingCategory._id, formData);
+        await categoryService.updateCategory(editingCategory._id, cleanFormData);
         toast.success('Category updated successfully');
       } else {
-        await categoryService.createCategory(formData);
+        await categoryService.createCategory(cleanFormData);
         toast.success('Category created successfully');
       }
       setShowModal(false);
       loadCategories();
       loadCategoryCounts();
     } catch (error) {
-      toast.error(editingCategory ? 'Failed to update category' : 'Failed to create category');
+      console.error('Category submit error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      toast.error(`${editingCategory ? 'Failed to update' : 'Failed to create'} category: ${errorMessage}`);
     }
   };
 

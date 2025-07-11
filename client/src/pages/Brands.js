@@ -82,18 +82,31 @@ const Brands = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clean up form data - ensure empty strings for optional fields
+    const cleanFormData = {
+      ...formData,
+      description: formData.description || '',
+      logo: formData.logo || '',
+      website: formData.website || ''
+    };
+    
     try {
+      console.log('Submitting brand data:', cleanFormData);
       if (editingBrand) {
-        await brandService.updateBrand(editingBrand._id, formData);
+        await brandService.updateBrand(editingBrand._id, cleanFormData);
         toast.success('Brand updated successfully');
       } else {
-        await brandService.createBrand(formData);
+        await brandService.createBrand(cleanFormData);
         toast.success('Brand created successfully');
       }
       setShowModal(false);
       loadBrands();
+      loadBrandCounts();
     } catch (error) {
-      toast.error(editingBrand ? 'Failed to update brand' : 'Failed to create brand');
+      console.error('Brand submit error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      toast.error(`${editingBrand ? 'Failed to update' : 'Failed to create'} brand: ${errorMessage}`);
     }
   };
 

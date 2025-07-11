@@ -17,9 +17,13 @@ const validateBrand = [
     .isLength({ max: 500 })
     .withMessage('Description cannot exceed 500 characters'),
   body('website')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isURL()
-    .withMessage('Please enter a valid URL')
+    .withMessage('Please enter a valid URL'),
+  body('logo')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Logo path too long')
 ];
 
 // Get all brands
