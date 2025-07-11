@@ -8,6 +8,7 @@ import brandService from '../services/brandService';
 import ProductModal from '../components/ProductModal';
 import ProductForm from '../components/ProductForm';
 import ImageWithFallback from '../components/ImageWithFallback';
+import AuthModal from '../components/AuthModal';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,9 +20,11 @@ const Products = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ show: false, product: null });
+  const [pendingCartProduct, setPendingCartProduct] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [pagination, setPagination] = useState({ current: 1, pages: 1, total: 0, limit: 12 });
   const [filters, setFilters] = useState({
@@ -232,6 +235,28 @@ const Products = () => {
     const newFilters = { ...filters, page };
     console.log('New filters for page change:', newFilters);
     setFilters(newFilters);
+  };
+
+  const handleAuthRequired = (product) => {
+    setPendingCartProduct(product);
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    if (pendingCartProduct) {
+      // Add the pending product to cart after successful authentication
+      addToCart(pendingCartProduct);
+      setPendingCartProduct(null);
+    }
+    setShowAuthModal(false);
+  };
+
+  const handleAddToCart = (product) => {
+    if (isAuthenticated) {
+      addToCart(product);
+    } else {
+      handleAuthRequired(product);
+    }
   };
 
   const formatPrice = (price) => {
@@ -551,7 +576,7 @@ const Products = () => {
                             className="w-100 add-to-cart-btn"
                             onClick={(e) => {
                               e.stopPropagation();
-                              addToCart(product);
+                              handleAddToCart(product);
                             }}
                           >
                             {isInCart(product._id) ? (
@@ -642,7 +667,7 @@ const Products = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                addToCart(product);
+                                handleAddToCart(product);
                               }}
                             >
                               {isInCart(product._id) ? (
@@ -724,6 +749,7 @@ const Products = () => {
           show={showModal}
           onHide={() => setShowModal(false)}
           product={selectedProduct}
+          onAuthRequired={handleAuthRequired}
         />
 
         <Modal show={showFormModal} onHide={() => setShowFormModal(false)} size="lg">
@@ -757,6 +783,16 @@ const Products = () => {
             </Button>
           </Modal.Footer>
         </Modal>
+
+        {/* Authentication Modal */}
+        <AuthModal
+          show={showAuthModal}
+          onHide={() => {
+            setShowAuthModal(false);
+            setPendingCartProduct(null);
+          }}
+          onLoginSuccess={handleAuthSuccess}
+        />
       </div>
     </>
   );

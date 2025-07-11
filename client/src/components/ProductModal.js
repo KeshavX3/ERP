@@ -2,10 +2,22 @@ import React from 'react';
 import { Modal, Row, Col, Badge, Button } from 'react-bootstrap';
 import ImageWithFallback from './ImageWithFallback';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
-const ProductModal = ({ show, onHide, product }) => {
+const ProductModal = ({ show, onHide, product, onAuthRequired }) => {
   const formatPrice = (price) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
   const { addToCart, isInCart, getItemQuantity } = useCart();
+  const { isAuthenticated } = useAuth();
+
+  const handleAddToCart = () => {
+    if (isAuthenticated) {
+      addToCart(product);
+    } else if (onAuthRequired) {
+      onAuthRequired(product);
+    } else {
+      addToCart(product); // Fallback to original behavior
+    }
+  };
 
   if (!product) return null;
 
@@ -61,7 +73,7 @@ const ProductModal = ({ show, onHide, product }) => {
                 variant={isInCart(product._id) ? "success" : "primary"}
                 size="lg"
                 className="w-100"
-                onClick={() => addToCart(product)}
+                onClick={handleAddToCart}
               >
                 {isInCart(product._id) ? (
                   <>

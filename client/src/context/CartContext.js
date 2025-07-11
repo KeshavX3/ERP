@@ -72,13 +72,17 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(state.items));
   }, [state.items]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, onAuthRequired) => {
     // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
+      // If onAuthRequired callback is provided, call it to show auth modal
+      if (onAuthRequired) {
+        onAuthRequired();
+        return;
+      }
+      // Fallback to toast warning if no callback provided
       toast.warning('Please login to add items to cart');
-      // Use window.location for navigation since useNavigate can't be used in context
-      window.location.href = '/login';
       return;
     }
 

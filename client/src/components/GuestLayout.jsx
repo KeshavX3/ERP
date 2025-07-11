@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import AuthModal from './AuthModal';
 
 const GuestLayout = ({ children }) => {
   const { getCartItemsCount } = useCart();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    setShowAuthModal(true);
+  };
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    setShowAuthModal(true);
+  };
 
   return (
     <div className="min-vh-100 d-flex flex-column">
@@ -34,8 +46,8 @@ const GuestLayout = ({ children }) => {
             </Nav>
             
             <Nav className="align-items-center">
-              {/* Cart Icon (will redirect to login when clicked) */}
-              <Nav.Link href="#" className="position-relative me-3">
+              {/* Cart Icon (shows auth modal when clicked) */}
+              <Nav.Link href="#" className="position-relative me-3" onClick={handleCartClick}>
                 <i className="fas fa-shopping-cart"></i>
                 {getCartItemsCount() > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -45,11 +57,20 @@ const GuestLayout = ({ children }) => {
               </Nav.Link>
               
               {/* Login/Register Buttons */}
-              <Button as={Link} to="/login" variant="outline-light" size="sm" className="me-2">
+              <Button 
+                variant="outline-light" 
+                size="sm" 
+                className="me-2"
+                onClick={handleLoginClick}
+              >
                 <i className="fas fa-sign-in-alt me-1"></i>
                 Login
               </Button>
-              <Button as={Link} to="/register" variant="light" size="sm">
+              <Button 
+                variant="light" 
+                size="sm"
+                onClick={handleLoginClick}
+              >
                 <i className="fas fa-user-plus me-1"></i>
                 Sign Up
               </Button>
@@ -83,6 +104,17 @@ const GuestLayout = ({ children }) => {
           </div>
         </Container>
       </footer>
+
+      {/* Authentication Modal */}
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onLoginSuccess={() => {
+          setShowAuthModal(false);
+          // Optionally redirect or refresh the page after login
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };
