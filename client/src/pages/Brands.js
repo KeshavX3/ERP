@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext';
 const Brands = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasPermission } = useAuth();
   const [brands, setBrands] = useState([]);
   const [brandCounts, setBrandCounts] = useState({});
   const [loading, setLoading] = useState(false);
@@ -167,7 +167,7 @@ const Brands = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            {isAuthenticated && (
+            {hasPermission('create_brand') && (
               <Button variant="primary" onClick={handleAdd}>
                 <i className="fas fa-plus me-2"></i>Add Brand
               </Button>
@@ -239,14 +239,16 @@ const Brands = () => {
                       <div className="brand-footer">
                         <small className="text-muted">Created: {new Date(brand.createdAt).toLocaleDateString()}</small>
                       </div>
-                      <div className="action-buttons mt-2">
-                        <Button variant="warning" size="sm" className="me-2" onClick={(e) => { e.stopPropagation(); handleEdit(brand); }}>
-                          <i className="fas fa-edit"></i>
-                        </Button>
-                        <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(brand); }}>
-                          <i className="fas fa-trash"></i>
-                        </Button>
-                      </div>
+                      {hasPermission('edit_brand') && (
+                        <div className="action-buttons mt-2">
+                          <Button variant="warning" size="sm" className="me-2" onClick={(e) => { e.stopPropagation(); handleEdit(brand); }}>
+                            <i className="fas fa-edit"></i>
+                          </Button>
+                          <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(brand); }}>
+                            <i className="fas fa-trash"></i>
+                          </Button>
+                        </div>
+                      )}
                     </Card.Body>
                   </Card>
                 </div>
@@ -259,7 +261,7 @@ const Brands = () => {
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Logo</th><th>Name</th><th>Description</th><th>Website</th><th>Products</th><th>Created</th><th>Actions</th>
+                        <th>Logo</th><th>Name</th><th>Description</th><th>Website</th><th>Products</th><th>Created</th>{hasPermission('edit_brand') && <th>Actions</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -279,12 +281,14 @@ const Brands = () => {
                           </td>
                           <td><Badge bg="primary">{brandCounts[brand._id] || 0} Products</Badge></td>
                           <td>{new Date(brand.createdAt).toLocaleDateString()}</td>
-                          <td>
-                            <div className="action-buttons d-flex gap-2">
-                              <Button variant="warning" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(brand); }}>Edit</Button>
-                              <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(brand); }}>Delete</Button>
-                            </div>
-                          </td>
+                          {hasPermission('edit_brand') && (
+                            <td>
+                              <div className="action-buttons d-flex gap-2">
+                                <Button variant="warning" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(brand); }}>Edit</Button>
+                                <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(brand); }}>Delete</Button>
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>

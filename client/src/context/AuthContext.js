@@ -92,6 +92,48 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  // Helper functions for role-based access control
+  const isAdmin = () => {
+    return user?.role === 'admin';
+  };
+
+  const isUser = () => {
+    return user?.role === 'user';
+  };
+
+  const hasPermission = (permission) => {
+    if (!user) return false;
+    
+    // Admin has all permissions
+    if (user.role === 'admin') return true;
+    
+    // Define user permissions
+    const userPermissions = [
+      'view_products',
+      'view_categories', 
+      'view_brands',
+      'add_to_cart',
+      'remove_from_cart',
+      'make_payment'
+    ];
+    
+    const adminPermissions = [
+      ...userPermissions,
+      'create_product',
+      'edit_product', 
+      'delete_product',
+      'create_category',
+      'edit_category',
+      'delete_category',
+      'create_brand',
+      'edit_brand',
+      'delete_brand'
+    ];
+    
+    const permissions = user.role === 'admin' ? adminPermissions : userPermissions;
+    return permissions.includes(permission);
+  };
+
   const value = {
     user,
     loading,
@@ -99,7 +141,10 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    updateUser
+    updateUser,
+    isAdmin,
+    isUser,
+    hasPermission
   };
 
   return (

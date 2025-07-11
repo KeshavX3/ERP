@@ -31,7 +31,7 @@ const Products = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToCart, isInCart, getItemQuantity } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, hasPermission } = useAuth();
   
   const priceRanges = [
     { value: '', label: 'All Prices' },
@@ -294,7 +294,7 @@ const Products = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            {isAuthenticated && (
+            {hasPermission('create_product') && (
               <Button variant="primary" onClick={handleAdd}>
                 <i className="fas fa-plus me-2"></i>Add Product
               </Button>
@@ -486,7 +486,7 @@ const Products = () => {
                           alt={product.name}
                           className="product-image"
                         />
-                        {isAuthenticated && (
+                        {hasPermission('edit_product') && (
                           <div className="product-actions">
                             <Button
                               variant="light"
@@ -586,7 +586,7 @@ const Products = () => {
                         <th>Category</th>
                         <th>Brand</th>
                         <th>Price</th>
-                        {isAuthenticated && <th>Actions</th>}
+                        {hasPermission('edit_product') && <th>Actions</th>}
                         <th>Cart</th>
                       </tr>
                     </thead>
@@ -608,7 +608,7 @@ const Products = () => {
                           <td>{product.category?.name}</td>
                           <td>{product.brand?.name}</td>
                           <td>{formatPrice(getDisplayPrice(product))}</td>
-                          {isAuthenticated && (
+                          {hasPermission('edit_product') && (
                             <td>
                               <div className="product-actions">
                                 <Button

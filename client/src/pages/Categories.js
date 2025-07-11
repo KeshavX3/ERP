@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext';
 const Categories = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasPermission } = useAuth();
   const [categories, setCategories] = useState([]);
   const [categoryCounts, setCategoryCounts] = useState({});
   const [loading, setLoading] = useState(false);
@@ -166,7 +166,7 @@ const Categories = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            {isAuthenticated && (
+            {hasPermission('create_category') && (
               <Button variant="primary" onClick={handleAdd}>
                 <i className="fas fa-plus me-2"></i>Add Category
               </Button>
@@ -223,7 +223,7 @@ const Categories = () => {
                         <div className="category-footer">
                           <small className="text-muted">Created: {new Date(category.createdAt).toLocaleDateString()}</small>
                         </div>
-                        {isAuthenticated && (
+                        {hasPermission('edit_category') && (
                           <div className="action-buttons mt-2">
                             <Button variant="warning" size="sm" className="me-2" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>
                               <i className="fas fa-edit"></i>
@@ -250,7 +250,7 @@ const Categories = () => {
                           <th>Description</th>
                           <th>Products</th>
                           <th>Created</th>
-                          {isAuthenticated && <th>Actions</th>}
+                          {hasPermission('edit_category') && <th>Actions</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -263,7 +263,7 @@ const Categories = () => {
                             <td>{category.description || 'No description'}</td>
                             <td><Badge bg="primary">{categoryCounts[category._id] || 0} Products</Badge></td>
                             <td>{new Date(category.createdAt).toLocaleDateString()}</td>
-                            {isAuthenticated && (
+                            {hasPermission('edit_category') && (
                               <td>
                                 <div className="action-buttons d-flex gap-2">
                                   <Button variant="warning" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>Edit</Button>
