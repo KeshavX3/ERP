@@ -56,7 +56,15 @@ const Categories = () => {
 
   const handleCategoryClick = (category, e) => {
     if (e.target.closest('.action-buttons')) return;
-    navigate(`/products?category=${category._id}`);
+    
+    console.log('Category clicked:', category.name, category._id);
+    // Navigate with state only for now
+    navigate('/products', {
+      state: {
+        categoryFilter: category._id,
+        categoryName: category.name
+      }
+    });
   };
 
   const handleAdd = () => {

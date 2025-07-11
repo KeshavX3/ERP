@@ -56,7 +56,15 @@ const Brands = () => {
 
   const handleBrandClick = (brand, e) => {
     if (e.target.closest('.action-buttons')) return;
-    navigate(`/products?brand=${brand._id}`);
+    
+    console.log('Brand clicked:', brand.name, brand._id);
+    // Navigate with state only for now
+    navigate('/products', {
+      state: {
+        brandFilter: brand._id,
+        brandName: brand.name
+      }
+    });
   };
 
   const handleAdd = () => {

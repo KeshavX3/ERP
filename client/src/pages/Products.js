@@ -24,7 +24,7 @@ const Products = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [pagination, setPagination] = useState({ current: 1, pages: 1, total: 0, limit: 12 });
   const [filters, setFilters] = useState({
-    search: '', category: '', brand: '', priceRange: '', minPrice: '', maxPrice: '', page: 1
+    search: '', category: '', brand: '', priceRange: '', minPrice: '', maxPrice: '', page: 1, limit: 12
   });
   
   const location = useLocation();
@@ -38,51 +38,41 @@ const Products = () => {
     { value: '1000-5000', label: '$1,000 - $5,000' },
     { value: '5000-above', label: '$5,000 & Above' }
   ];
+  // Handle navigation state from Categories/Brands pages
   useEffect(() => {
-    let shouldUpdateFilters = false;
-    let newFilters = { ...filters };
-
-    // Handle navigation state from Categories/Brands pages (priority)
     if (location.state) {
       const { categoryFilter, brandFilter, categoryName, brandName } = location.state;
-      if (categoryFilter) {
+      console.log('Navigation state received:', location.state);
+      
+      let newFilters = { ...filters };
+      let shouldUpdate = false;
+
+      if (categoryFilter && categoryFilter !== filters.category) {
         newFilters.category = categoryFilter;
         newFilters.page = 1;
-        shouldUpdateFilters = true;
+        shouldUpdate = true;
         toast.info(`Showing products from category: ${categoryName}`);
       }
-      if (brandFilter) {
+      
+      if (brandFilter && brandFilter !== filters.brand) {
         newFilters.brand = brandFilter;
         newFilters.page = 1;
-        shouldUpdateFilters = true;
+        shouldUpdate = true;
         toast.info(`Showing products from brand: ${brandName}`);
       }
       
-      // Clear navigation state immediately
-      navigate(location.pathname, { replace: true, state: null });
-    } else {
-      // Handle URL parameters if no navigation state
-      const urlParams = new URLSearchParams(location.search);
-      const categoryParam = urlParams.get('category');
-      const brandParam = urlParams.get('brand');
-      
-      if (categoryParam && categoryParam !== filters.category) {
-        newFilters.category = categoryParam;
-        shouldUpdateFilters = true;
-      }
-      if (brandParam && brandParam !== filters.brand) {
-        newFilters.brand = brandParam;
-        shouldUpdateFilters = true;
+      if (shouldUpdate) {
+        console.log('Updating filters from navigation:', newFilters);
+        setFilters(newFilters);
       }
     }
-
-    if (shouldUpdateFilters) {
-      setFilters(newFilters);
-    }
-  }, [location.state, location.search, location.pathname, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
+    console.log('🔄 LoadProducts called with filters:', filters);
+    console.log('🔄 Call stack:', new Error().stack?.split('\n')[1]);
     try {
       // Process price range filter
       let processedFilters = { ...filters };
@@ -100,38 +90,58 @@ const Products = () => {
       }
       
       const response = await productService.getProducts(processedFilters);
-      setProducts(response.products);
-      setPagination(response.pagination);
+      console.log('Products API response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response.products:', response.products);
+      console.log('Response.pagination:', response.pagination);
+      setProducts(response.products || []);
+      setPagination(response.pagination || { current: 1, pages: 1, total: 0, limit: processedFilters.limit || 12 });
     } catch (error) {
+      console.error('Load products error:', error);
       toast.error('Failed to load products');
+      setProducts([]); // Set empty array on error
+      setPagination({ current: 1, pages: 1, total: 0, limit: 12 });
     } finally {
       setLoading(false);
     }
   }, [filters]);
 
+  // Load products when filters change
   useEffect(() => {
+    console.log('useEffect: loadProducts triggered by filters change');
     loadProducts();
+  }, [loadProducts]);
+
+  // Load categories and brands only once
+  useEffect(() => {
+    console.log('useEffect: Loading categories and brands once');
     loadCategories();
     loadBrands();
-  }, [filters, loadProducts]);
+  }, []);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
+      console.log('Loading categories...');
       const response = await categoryService.getCategories({ limit: 100 });
-      setCategories(response.categories);
+      console.log('Categories loaded:', response.categories?.length || 0);
+      setCategories(response.categories || []);
     } catch (error) {
       console.error('Failed to load categories:', error);
+      setCategories([]);
     }
-  };
+  }, []);
 
-  const loadBrands = async () => {
+  const loadBrands = useCallback(async () => {
     try {
+      console.log('Loading brands...');
       const response = await brandService.getBrands({ limit: 100 });
-      setBrands(response.brands);
+      console.log('Brands loaded:', response.brands?.length || 0);
+      setBrands(response.brands || []);
     } catch (error) {
       console.error('Failed to load brands:', error);
+      setBrands([]);
     }
-  };
+  }, []);
 
   const handleAdd = () => {
     setSelectedProduct(null);
@@ -189,11 +199,15 @@ const Products = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters({
+    console.log(`Filter change: ${key} = ${value}`);
+    const newFilters = {
       ...filters,
       [key]: value,
       page: 1 // Reset to first page when filtering
-    });
+    };
+    
+    console.log('New filters:', newFilters);
+    setFilters(newFilters);
   };
 
   const clearAllFilters = () => {
@@ -204,14 +218,18 @@ const Products = () => {
       priceRange: '',
       minPrice: '',
       maxPrice: '',
-      page: 1
+      page: 1,
+      limit: 12
     });
     // Clear URL parameters
     navigate('/products', { replace: true });
   };
 
   const handlePageChange = (page) => {
-    setFilters({ ...filters, page });
+    console.log(`Page change: ${page}`);
+    const newFilters = { ...filters, page };
+    console.log('New filters for page change:', newFilters);
+    setFilters(newFilters);
   };
 
   const formatPrice = (price) => {
@@ -355,7 +373,7 @@ const Products = () => {
                 <div className="filter-group">
                   <label className="filter-label">Items per page</label>
                   <Form.Select
-                    value={pagination.limit}
+                    value={filters.limit}
                     onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
                     className="filter-select"
                   >
