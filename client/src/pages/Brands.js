@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import brandService from '../services/brandService';
 import productService from '../services/productService';
 import ImageWithFallback from '../components/ImageWithFallback';
+import FileUpload from '../components/FileUpload';
 
 const Brands = () => {
   const location = useLocation();
@@ -108,7 +109,8 @@ const Brands = () => {
   };
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   // Clean up navigation effect
@@ -183,7 +185,17 @@ const Brands = () => {
                 <div key={brand._id} className="brand-card-container">
                   <Card className="brand-card h-100 shadow-sm" style={{ cursor: 'pointer' }} onClick={(e) => handleBrandClick(brand, e)}>
                     <div className="brand-image-container">
-                      <ImageWithFallback src={brand.logo} alt={brand.name} className="brand-image" fallbackSrc="/api/placeholder/300/200" />
+                      <ImageWithFallback 
+                        src={brand.logo} 
+                        alt={brand.name} 
+                        className="brand-image" 
+                        fallbackSrc="https://via.placeholder.com/300x200/764ba2/ffffff?text=Brand"
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover' 
+                        }}
+                      />
                       <div className="brand-overlay">
                         <Badge bg="primary" className="product-count-badge">{brandCounts[brand._id] || 0} Products</Badge>
                       </div>
@@ -274,18 +286,28 @@ const Brands = () => {
               <Form.Label>Description</Form.Label>
               <Form.Control as="textarea" rows={3} name="description" value={formData.description} onChange={handleInputChange} />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Logo URL</Form.Label>
-              <Form.Control type="url" name="logo" value={formData.logo} onChange={handleInputChange} />
-              {formData.logo && (
-                <div className="mt-2">
-                  <img src={formData.logo} alt="Preview" style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover' }} />
-                </div>
-              )}
-            </Form.Group>
+            
+            <FileUpload
+              label="Brand Logo"
+              currentImage={formData.logo}
+              onFileUpload={(imagePath) => {
+                setFormData(prev => ({ ...prev, logo: imagePath }));
+              }}
+              accept="image/*"
+              maxSize={5 * 1024 * 1024} // 5MB
+            />
             <Form.Group className="mb-3">
               <Form.Label>Website</Form.Label>
-              <Form.Control type="url" name="website" value={formData.website} onChange={handleInputChange} />
+              <Form.Control 
+                type="url" 
+                name="website" 
+                value={formData.website} 
+                onChange={handleInputChange}
+                placeholder="Enter website URL (e.g., https://example.com)"
+              />
+              <Form.Text className="text-muted">
+                Brand's official website URL
+              </Form.Text>
             </Form.Group>
             <div className="d-flex justify-content-end gap-2">
               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>

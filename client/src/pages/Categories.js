@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Modal, Form, Badge } from 'react-bootstrap';
+import { Container, Card, Button, Modal, Form, Badge } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import categoryService from '../services/categoryService';
 import productService from '../services/productService';
 import ImageWithFallback from '../components/ImageWithFallback';
+import FileUpload from '../components/FileUpload';
 
 const Categories = () => {
   const location = useLocation();
@@ -109,7 +110,8 @@ const Categories = () => {
   };
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   // Clean up navigation effect
@@ -175,7 +177,17 @@ const Categories = () => {
                   <div key={category._id} className="category-card-container">
                     <Card className="category-card h-100 shadow-sm" style={{ cursor: 'pointer', maxWidth: '400px', minWidth: '260px', margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100%' }} onClick={(e) => handleCategoryClick(category, e)}>
                       <div className="category-image-container" style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', overflow: 'hidden', borderRadius: '12px 12px 0 0' }}>
-                        <ImageWithFallback src={category.image} alt={category.name} className="category-image" fallbackSrc="/api/placeholder/300/200" />
+                        <ImageWithFallback 
+                          src={category.image} 
+                          alt={category.name} 
+                          className="category-image" 
+                          fallbackSrc="https://via.placeholder.com/300x200/667eea/ffffff?text=Category"
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover' 
+                          }}
+                        />
                         <div className="category-overlay">
                           <Badge bg="primary" className="product-count-badge">{categoryCounts[category._id] || 0} Products</Badge>
                         </div>
@@ -258,15 +270,16 @@ const Categories = () => {
                 <Form.Label>Description</Form.Label>
                 <Form.Control as="textarea" rows={3} name="description" value={formData.description} onChange={handleInputChange} />
               </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Image URL</Form.Label>
-                <Form.Control type="url" name="image" value={formData.image} onChange={handleInputChange} />
-                {formData.image && (
-                  <div className="mt-2">
-                    <img src={formData.image} alt="Preview" style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover' }} />
-                  </div>
-                )}
-              </Form.Group>
+              
+              <FileUpload
+                label="Category Image"
+                currentImage={formData.image}
+                onFileUpload={(imagePath) => {
+                  setFormData(prev => ({ ...prev, image: imagePath }));
+                }}
+                accept="image/*"
+                maxSize={5 * 1024 * 1024} // 5MB
+              />
               <div className="d-flex justify-content-end gap-2">
                 <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
                 <Button type="submit" variant="primary">{editingCategory ? 'Update' : 'Create'}</Button>
