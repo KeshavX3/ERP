@@ -73,6 +73,15 @@ export const CartProvider = ({ children }) => {
   }, [state.items]);
 
   const addToCart = (product) => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.warning('Please login to add items to cart');
+      // Use window.location for navigation since useNavigate can't be used in context
+      window.location.href = '/login';
+      return;
+    }
+
     // Calculate discountPrice for cart
     const productWithDiscountPrice = {
       ...product,

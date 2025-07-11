@@ -6,10 +6,12 @@ import categoryService from '../services/categoryService';
 import productService from '../services/productService';
 import ImageWithFallback from '../components/ImageWithFallback';
 import FileUpload from '../components/FileUpload';
+import { useAuth } from '../context/AuthContext';
 
 const Categories = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [categories, setCategories] = useState([]);
   const [categoryCounts, setCategoryCounts] = useState({});
   const [loading, setLoading] = useState(false);
@@ -164,9 +166,11 @@ const Categories = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            <Button variant="primary" onClick={handleAdd}>
-              <i className="fas fa-plus me-2"></i>Add Category
-            </Button>
+            {isAuthenticated && (
+              <Button variant="primary" onClick={handleAdd}>
+                <i className="fas fa-plus me-2"></i>Add Category
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -219,14 +223,16 @@ const Categories = () => {
                         <div className="category-footer">
                           <small className="text-muted">Created: {new Date(category.createdAt).toLocaleDateString()}</small>
                         </div>
-                        <div className="action-buttons mt-2">
-                          <Button variant="warning" size="sm" className="me-2" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>
-                            <i className="fas fa-edit"></i>
-                          </Button>
-                          <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(category); }}>
-                            <i className="fas fa-trash"></i>
-                          </Button>
-                        </div>
+                        {isAuthenticated && (
+                          <div className="action-buttons mt-2">
+                            <Button variant="warning" size="sm" className="me-2" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>
+                              <i className="fas fa-edit"></i>
+                            </Button>
+                            <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(category); }}>
+                              <i className="fas fa-trash"></i>
+                            </Button>
+                          </div>
+                        )}
                       </Card.Body>
                     </Card>
                   </div>
@@ -244,7 +250,7 @@ const Categories = () => {
                           <th>Description</th>
                           <th>Products</th>
                           <th>Created</th>
-                          <th>Actions</th>
+                          {isAuthenticated && <th>Actions</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -257,12 +263,14 @@ const Categories = () => {
                             <td>{category.description || 'No description'}</td>
                             <td><Badge bg="primary">{categoryCounts[category._id] || 0} Products</Badge></td>
                             <td>{new Date(category.createdAt).toLocaleDateString()}</td>
-                            <td>
-                              <div className="action-buttons d-flex gap-2">
-                                <Button variant="warning" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>Edit</Button>
-                                <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(category); }}>Delete</Button>
-                              </div>
-                            </td>
+                            {isAuthenticated && (
+                              <td>
+                                <div className="action-buttons d-flex gap-2">
+                                  <Button variant="warning" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>Edit</Button>
+                                  <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(category); }}>Delete</Button>
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>

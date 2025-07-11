@@ -6,10 +6,12 @@ import brandService from '../services/brandService';
 import productService from '../services/productService';
 import ImageWithFallback from '../components/ImageWithFallback';
 import FileUpload from '../components/FileUpload';
+import { useAuth } from '../context/AuthContext';
 
 const Brands = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [brands, setBrands] = useState([]);
   const [brandCounts, setBrandCounts] = useState({});
   const [loading, setLoading] = useState(false);
@@ -165,9 +167,11 @@ const Brands = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            <Button variant="primary" onClick={handleAdd}>
-              <i className="fas fa-plus me-2"></i>Add Brand
-            </Button>
+            {isAuthenticated && (
+              <Button variant="primary" onClick={handleAdd}>
+                <i className="fas fa-plus me-2"></i>Add Brand
+              </Button>
+            )}
           </div>
         </div>
       </div>

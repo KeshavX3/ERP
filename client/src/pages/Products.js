@@ -9,6 +9,7 @@ import ProductModal from '../components/ProductModal';
 import ProductForm from '../components/ProductForm';
 import ImageWithFallback from '../components/ImageWithFallback';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Products = () => {
   // State management
@@ -30,6 +31,7 @@ const Products = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToCart, isInCart, getItemQuantity } = useCart();
+  const { isAuthenticated } = useAuth();
   
   const priceRanges = [
     { value: '', label: 'All Prices' },
@@ -68,6 +70,30 @@ const Products = () => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
+
+  const loadCategories = useCallback(async () => {
+    try {
+      console.log('Loading categories...');
+      const response = await categoryService.getCategories({ limit: 100 });
+      console.log('Categories loaded:', response.categories?.length || 0);
+      setCategories(response.categories || []);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      setCategories([]);
+    }
+  }, []);
+
+  const loadBrands = useCallback(async () => {
+    try {
+      console.log('Loading brands...');
+      const response = await brandService.getBrands({ limit: 100 });
+      console.log('Brands loaded:', response.brands?.length || 0);
+      setBrands(response.brands || []);
+    } catch (error) {
+      console.error('Failed to load brands:', error);
+      setBrands([]);
+    }
+  }, []);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -117,31 +143,7 @@ const Products = () => {
     console.log('useEffect: Loading categories and brands once');
     loadCategories();
     loadBrands();
-  }, []);
-
-  const loadCategories = useCallback(async () => {
-    try {
-      console.log('Loading categories...');
-      const response = await categoryService.getCategories({ limit: 100 });
-      console.log('Categories loaded:', response.categories?.length || 0);
-      setCategories(response.categories || []);
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-      setCategories([]);
-    }
-  }, []);
-
-  const loadBrands = useCallback(async () => {
-    try {
-      console.log('Loading brands...');
-      const response = await brandService.getBrands({ limit: 100 });
-      console.log('Brands loaded:', response.brands?.length || 0);
-      setBrands(response.brands || []);
-    } catch (error) {
-      console.error('Failed to load brands:', error);
-      setBrands([]);
-    }
-  }, []);
+  }, [loadCategories, loadBrands]);
 
   const handleAdd = () => {
     setSelectedProduct(null);
@@ -292,9 +294,11 @@ const Products = () => {
             >
               <i className="fas fa-list me-1"></i>Table
             </Button>
-            <Button variant="primary" onClick={handleAdd}>
-              <i className="fas fa-plus me-2"></i>Add Product
-            </Button>
+            {isAuthenticated && (
+              <Button variant="primary" onClick={handleAdd}>
+                <i className="fas fa-plus me-2"></i>Add Product
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -482,30 +486,32 @@ const Products = () => {
                           alt={product.name}
                           className="product-image"
                         />
-                        <div className="product-actions">
-                          <Button
-                            variant="light"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(product);
-                            }}
-                            title="Edit"
-                          >
-                            <i className="fas fa-edit"></i>
-                          </Button>
-                          <Button
-                            variant="light"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(product);
-                            }}
-                            title="Delete"
-                          >
-                            <i className="fas fa-trash"></i>
-                          </Button>
-                        </div>
+                        {isAuthenticated && (
+                          <div className="product-actions">
+                            <Button
+                              variant="light"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(product);
+                              }}
+                              title="Edit"
+                            >
+                              <i className="fas fa-edit"></i>
+                            </Button>
+                            <Button
+                              variant="light"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(product);
+                              }}
+                              title="Delete"
+                            >
+                              <i className="fas fa-trash"></i>
+                            </Button>
+                          </div>
+                        )}
                       </div>
                       <Card.Body className="product-info">
                         <div className="product-category">
@@ -580,7 +586,7 @@ const Products = () => {
                         <th>Category</th>
                         <th>Brand</th>
                         <th>Price</th>
-                        <th>Actions</th>
+                        {isAuthenticated && <th>Actions</th>}
                         <th>Cart</th>
                       </tr>
                     </thead>
@@ -602,32 +608,34 @@ const Products = () => {
                           <td>{product.category?.name}</td>
                           <td>{product.brand?.name}</td>
                           <td>{formatPrice(getDisplayPrice(product))}</td>
-                          <td>
-                            <div className="product-actions">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEdit(product);
-                                }}
-                                title="Edit"
-                              >
-                                <i className="fas fa-edit"></i>
-                              </Button>
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(product);
-                                }}
-                                title="Delete"
-                              >
-                                <i className="fas fa-trash"></i>
-                              </Button>
-                            </div>
-                          </td>
+                          {isAuthenticated && (
+                            <td>
+                              <div className="product-actions">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(product);
+                                  }}
+                                  title="Edit"
+                                >
+                                  <i className="fas fa-edit"></i>
+                                </Button>
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(product);
+                                  }}
+                                  title="Delete"
+                                >
+                                  <i className="fas fa-trash"></i>
+                                </Button>
+                              </div>
+                            </td>
+                          )}
                           <td>
                             <Button
                               variant={isInCart(product._id) ? "success" : "primary"}

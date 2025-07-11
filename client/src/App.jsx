@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import { useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
+import GuestLayout from './components/GuestLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Products from './pages/Products';
@@ -38,51 +38,57 @@ function App() {
             element={isAuthenticated ? <Navigate to="/products" /> : <Register />} 
           />
           
-          {/* Protected Routes */}
+          {/* Guest Browsing Routes - No authentication required */}
           <Route 
             path="/" 
+            element={<Navigate to="/products" />}
+          />
+          <Route 
+            path="/products" 
             element={
-              <ProtectedRoute>
+              isAuthenticated ? (
                 <Layout>
-                  <Navigate to="/products" />
+                  <Products />
                 </Layout>
-              </ProtectedRoute>
+              ) : (
+                <GuestLayout>
+                  <Products />
+                </GuestLayout>
+              )
             } 
           />
-        <Route 
-          path="/products" 
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Products />
-              </Layout>
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/categories" 
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Categories />
-              </Layout>
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/brands" 
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Brands />
-              </Layout>
-            </ProtectedRoute>
-          } 
-        />
+          <Route 
+            path="/categories" 
+            element={
+              isAuthenticated ? (
+                <Layout>
+                  <Categories />
+                </Layout>
+              ) : (
+                <GuestLayout>
+                  <Categories />
+                </GuestLayout>
+              )
+            } 
+          />
+          <Route 
+            path="/brands" 
+            element={
+              isAuthenticated ? (
+                <Layout>
+                  <Brands />
+                </Layout>
+              ) : (
+                <GuestLayout>
+                  <Brands />
+                </GuestLayout>
+              )
+            } 
+          />
         
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/products" : "/login"} />} />
-      </Routes>
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/products" />} />
+        </Routes>
       
       <ToastContainer
         position="top-right"
