@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { useAuth } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -24,29 +25,30 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Routes>
-        {/* Public Routes */}
-        <Route 
-          path="/login" 
-          element={isAuthenticated ? <Navigate to="/products" /> : <Login />} 
-        />
-        <Route 
-          path="/register" 
-          element={isAuthenticated ? <Navigate to="/products" /> : <Register />} 
-        />
-        
-        {/* Protected Routes */}
-        <Route 
-          path="/" 
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Navigate to="/products" />
-              </Layout>
-            </ProtectedRoute>
-          } 
-        />
+    <CartProvider>
+      <div className="App">
+        <Routes>
+          {/* Public Routes */}
+          <Route 
+            path="/login" 
+            element={isAuthenticated ? <Navigate to="/products" /> : <Login />} 
+          />
+          <Route 
+            path="/register" 
+            element={isAuthenticated ? <Navigate to="/products" /> : <Register />} 
+          />
+          
+          {/* Protected Routes */}
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Navigate to="/products" />
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
         <Route 
           path="/products" 
           element={
@@ -94,6 +96,7 @@ function App() {
         pauseOnHover
       />
     </div>
+    </CartProvider>
   );
 }
 

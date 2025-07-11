@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Table, Modal, Form, Pagination, Row, Col } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import brandService from '../services/brandService';
 import ProductModal from '../components/ProductModal';
 import ProductForm from '../components/ProductForm';
 import ImageWithFallback from '../components/ImageWithFallback';
+import { useCart } from '../context/CartContext';
 
 const Products = () => {
   // State management
@@ -28,6 +29,7 @@ const Products = () => {
   
   const location = useLocation();
   const navigate = useNavigate();
+  const { addToCart, isInCart, getItemQuantity } = useCart();
   
   const priceRanges = [
     { value: '', label: 'All Prices' },
@@ -77,15 +79,9 @@ const Products = () => {
     if (shouldUpdateFilters) {
       setFilters(newFilters);
     }
-  }, [location.state, location.search, navigate]);
+  }, [location.state, location.search, location.pathname, navigate]);
 
-  useEffect(() => {
-    loadProducts();
-    loadCategories();
-    loadBrands();
-  }, [filters]);
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       // Process price range filter
@@ -111,7 +107,13 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    loadProducts();
+    loadCategories();
+    loadBrands();
+  }, [filters, loadProducts]);
 
   const loadCategories = async () => {
     try {
@@ -129,6 +131,11 @@ const Products = () => {
     } catch (error) {
       console.error('Failed to load brands:', error);
     }
+  };
+
+  const handleAdd = () => {
+    setSelectedProduct(null);
+    setShowFormModal(true);
   };
 
   const handleView = (product) => {
@@ -244,38 +251,32 @@ const Products = () => {
   };
 
   return (
-    <div className="main-content">
-      <div className="page-content">
-        {/* Header */}
-        <div className="products-header-section">
-          <div className="header">
-            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-              <div>
-                <h1 className="mb-0">Products</h1>
-                <p className="text-muted mb-0">Manage your product inventory</p>
-              </div>
-              <div className="d-flex gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <i className="fas fa-th me-1"></i>Grid
-                </Button>
-                <Button
-                  variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
-                  size="sm"
-                  onClick={() => setViewMode('table')}
-                >
-                <i className="fas fa-list me-1"></i>Table
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => setShowFormModal(true)}
-              >
-                <i className="fas fa-plus me-2"></i>Add Product
-              </Button>
-            </div>
+    <>
+      <div className="fade-in">
+        <div className="modern-page-header">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h1 className="page-title">Products</h1>
+            <p className="page-subtitle">Manage your product inventory with style</p>
+          </div>
+          <div className="d-flex gap-2">
+            <Button
+              variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+            >
+              <i className="fas fa-th me-1"></i>Grid
+            </Button>
+            <Button
+              variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+            >
+              <i className="fas fa-list me-1"></i>Table
+            </Button>
+            <Button variant="primary" onClick={handleAdd}>
+              <i className="fas fa-plus me-2"></i>Add Product
+            </Button>
           </div>
         </div>
       </div>
@@ -511,15 +512,36 @@ const Products = () => {
                                   {product.discount}% OFF
                                 </span>
                               </div>
-                              <div className="current-price" style={{ color: '#27ae60', fontWeight: 700, fontSize: '1.3rem' }}>
+                              <div className="current-price mb-2" style={{ color: '#27ae60', fontWeight: 700, fontSize: '1.3rem' }}>
                                 {formatPrice(getDisplayPrice(product))}
                               </div>
                             </>
                           ) : (
-                            <div className="current-price" style={{ color: '#27ae60', fontWeight: 700, fontSize: '1.3rem' }}>
+                            <div className="current-price mb-2" style={{ color: '#27ae60', fontWeight: 700, fontSize: '1.3rem' }}>
                               {formatPrice(product.price)}
                             </div>
                           )}
+                          <Button
+                            variant={isInCart(product._id) ? "success" : "primary"}
+                            size="sm"
+                            className="w-100 add-to-cart-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addToCart(product);
+                            }}
+                          >
+                            {isInCart(product._id) ? (
+                              <>
+                                <i className="fas fa-check me-1"></i>
+                                In Cart ({getItemQuantity(product._id)})
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-cart-plus me-1"></i>
+                                Add to Cart
+                              </>
+                            )}
+                          </Button>
                         </div>
                       </Card.Body>
                     </Card>
@@ -541,6 +563,7 @@ const Products = () => {
                         <th>Brand</th>
                         <th>Price</th>
                         <th>Actions</th>
+                        <th>Cart</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -586,6 +609,28 @@ const Products = () => {
                                 <i className="fas fa-trash"></i>
                               </Button>
                             </div>
+                          </td>
+                          <td>
+                            <Button
+                              variant={isInCart(product._id) ? "success" : "primary"}
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToCart(product);
+                              }}
+                            >
+                              {isInCart(product._id) ? (
+                                <>
+                                  <i className="fas fa-check me-1"></i>
+                                  In Cart ({getItemQuantity(product._id)})
+                                </>
+                              ) : (
+                                <>
+                                  <i className="fas fa-cart-plus me-1"></i>
+                                  Add to Cart
+                                </>
+                              )}
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -685,10 +730,9 @@ const Products = () => {
               Delete
             </Button>
           </Modal.Footer>
-      </Modal>
+        </Modal>
       </div>
-    </div>
-
+    </>
   );
 };
 

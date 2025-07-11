@@ -67,48 +67,177 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem'
+    }}>
       <Container>
         <Row className="justify-content-center">
-          <Col md={6} lg={4}>
-            <Card className="auth-card">
-              <Card.Body>
+          <Col md={6} lg={5} xl={4}>
+            <div className="text-center mb-4">
+              <div className="auth-brand mb-4">
+                <i className="fas fa-cube" style={{ fontSize: '3rem', color: '#fff', marginBottom: '1rem' }}></i>
+                <h1 style={{ color: '#fff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+                  ERP<span style={{ color: '#4ecdc4' }}>Pro</span>
+                </h1>
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem' }}>Enterprise Resource Planning</p>
+              </div>
+            </div>
+            
+            <Card className="auth-card" style={{ 
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '20px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            }}>
+              <Card.Body style={{ padding: '3rem' }}>
                 <div className="text-center mb-4">
-                  <h2 className="mb-3">Sign Up</h2>
-                  <p className="text-muted">Create a new account to get started.</p>
+                  <h2 className="mb-3" style={{ 
+                    fontWeight: '700',
+                    background: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>Create Account</h2>
+                  <p className="text-muted">Join us and start managing your business</p>
                 </div>
 
-                {error && <Alert variant="danger">{error}</Alert>}
+                {error && (
+                  <Alert variant="danger" style={{ 
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                    color: 'white'
+                  }}>
+                    {error}
+                  </Alert>
+                )}
 
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Enter your username" isInvalid={!!errors.username} required />
+                    <Form.Label style={{ fontWeight: '600', color: '#2c3e50' }}>Username</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="username" 
+                      value={formData.username} 
+                      onChange={handleChange} 
+                      placeholder="Enter your username" 
+                      isInvalid={!!errors.username} 
+                      required 
+                      style={{
+                        padding: '0.8rem 1.2rem',
+                        borderRadius: '12px',
+                        border: '2px solid rgba(102, 126, 234, 0.1)',
+                        fontSize: '1rem'
+                      }}
+                    />
                     <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label>Email Address</Form.Label>
-                    <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter your email" isInvalid={!!errors.email} required />
+                    <Form.Label style={{ fontWeight: '600', color: '#2c3e50' }}>Email Address</Form.Label>
+                    <Form.Control 
+                      type="email" 
+                      name="email" 
+                      value={formData.email} 
+                      onChange={handleChange} 
+                      placeholder="Enter your email" 
+                      isInvalid={!!errors.email} 
+                      required 
+                      style={{
+                        padding: '0.8rem 1.2rem',
+                        borderRadius: '12px',
+                        border: '2px solid rgba(102, 126, 234, 0.1)',
+                        fontSize: '1rem'
+                      }}
+                    />
                     <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter your password" isInvalid={!!errors.password} required />
+                    <Form.Label style={{ fontWeight: '600', color: '#2c3e50' }}>Password</Form.Label>
+                    <Form.Control 
+                      type="password" 
+                      name="password" 
+                      value={formData.password} 
+                      onChange={handleChange} 
+                      placeholder="Enter your password" 
+                      isInvalid={!!errors.password} 
+                      required 
+                      style={{
+                        padding: '0.8rem 1.2rem',
+                        borderRadius: '12px',
+                        border: '2px solid rgba(102, 126, 234, 0.1)',
+                        fontSize: '1rem'
+                      }}
+                    />
                     <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
                   </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Confirm Password</Form.Label>
-                    <Form.Control type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm your password" isInvalid={!!errors.confirmPassword} required />
+                  <Form.Group className="mb-4">
+                    <Form.Label style={{ fontWeight: '600', color: '#2c3e50' }}>Confirm Password</Form.Label>
+                    <Form.Control 
+                      type="password" 
+                      name="confirmPassword" 
+                      value={formData.confirmPassword} 
+                      onChange={handleChange} 
+                      placeholder="Confirm your password" 
+                      isInvalid={!!errors.confirmPassword} 
+                      required 
+                      style={{
+                        padding: '0.8rem 1.2rem',
+                        borderRadius: '12px',
+                        border: '2px solid rgba(102, 126, 234, 0.1)',
+                        fontSize: '1rem'
+                      }}
+                    />
                     <Form.Control.Feedback type="invalid">{errors.confirmPassword}</Form.Control.Feedback>
                   </Form.Group>
-                  <Button type="submit" variant="primary" size="lg" className="w-100 mb-3" disabled={loading}>
-                    {loading ? 'Creating Account...' : 'Sign Up'}
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-100 mb-3" 
+                    disabled={loading}
+                    style={{
+                      padding: '0.8rem',
+                      borderRadius: '12px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      fontWeight: '600',
+                      fontSize: '1.1rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    {loading ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin me-2"></i>
+                        Creating Account...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-user-plus me-2"></i>
+                        Create Account
+                      </>
+                    )}
                   </Button>
                 </Form>
 
                 <div className="text-center">
-                  <p className="mb-0">
-                    Already have an account? <Link to="/login" className="text-primary">Sign in here</Link>
+                  <p className="mb-0" style={{ color: '#7f8c8d' }}>
+                    Already have an account? {' '}
+                    <Link 
+                      to="/login" 
+                      style={{ 
+                        color: '#667eea',
+                        textDecoration: 'none',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Sign in here
+                    </Link>
                   </p>
                 </div>
               </Card.Body>

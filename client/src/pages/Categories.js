@@ -121,39 +121,36 @@ const Categories = () => {
   }, [location.state, navigate, location.pathname]);
 
   return (
-    <div className="main-content">
-      <Container fluid className="px-4">
-        {/* Header Section */}
-        <div className="header">
-          <Row className="align-items-center">
-            <Col>
-              <h1 className="mb-0">Categories</h1>
-              <p className="text-muted mb-0">Manage your product categories</p>
-            </Col>
-            <Col xs="auto">
-              <div className="d-flex gap-2">
-                <Button 
-                  variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
-                  onClick={() => setViewMode('grid')}
-                  size="sm"
-                >
-                  <i className="fas fa-th-large me-1"></i>Grid
-                </Button>
-                <Button 
-                  variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
-                  onClick={() => setViewMode('table')}
-                  size="sm"
-                >
-                  <i className="fas fa-list me-1"></i>Table
-                </Button>
-                <Button variant="primary" onClick={handleAdd}>
-                  <i className="fas fa-plus me-2"></i>Add Category
-                </Button>
-              </div>
-            </Col>
-          </Row>
+    <div className="fade-in">
+      <div className="modern-page-header">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h1 className="page-title">Categories</h1>
+            <p className="page-subtitle">Organize your products with beautiful categories</p>
+          </div>
+          <div className="d-flex gap-2">
+            <Button 
+              variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
+              onClick={() => setViewMode('grid')}
+              size="sm"
+            >
+              <i className="fas fa-th-large me-1"></i>Grid
+            </Button>
+            <Button 
+              variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
+              onClick={() => setViewMode('table')}
+              size="sm"
+            >
+              <i className="fas fa-list me-1"></i>Table
+            </Button>
+            <Button variant="primary" onClick={handleAdd}>
+              <i className="fas fa-plus me-2"></i>Add Category
+            </Button>
+          </div>
         </div>
+      </div>
 
+      <Container fluid className="px-0">
         {/* Main Content */}
         {loading ? (
           <div className="loading-spinner">

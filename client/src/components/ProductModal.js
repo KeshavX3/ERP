@@ -1,11 +1,13 @@
 import React from 'react';
-import { Modal, Row, Col, Badge } from 'react-bootstrap';
+import { Modal, Row, Col, Badge, Button } from 'react-bootstrap';
 import ImageWithFallback from './ImageWithFallback';
+import { useCart } from '../context/CartContext';
 
 const ProductModal = ({ show, onHide, product }) => {
-  if (!product) return null;
-
   const formatPrice = (price) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  const { addToCart, isInCart, getItemQuantity } = useCart();
+
+  if (!product) return null;
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -53,6 +55,27 @@ const ProductModal = ({ show, onHide, product }) => {
                 </div>
               </div>
             )}
+
+            <div className="mt-4">
+              <Button
+                variant={isInCart(product._id) ? "success" : "primary"}
+                size="lg"
+                className="w-100"
+                onClick={() => addToCart(product)}
+              >
+                {isInCart(product._id) ? (
+                  <>
+                    <i className="fas fa-check me-2"></i>
+                    In Cart ({getItemQuantity(product._id)}) - Add More
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-cart-plus me-2"></i>
+                    Add to Cart
+                  </>
+                )}
+              </Button>
+            </div>
           </Col>
         </Row>
         

@@ -120,41 +120,42 @@ const Brands = () => {
   }, [location.state, navigate, location.pathname]);
 
   return (
-    <div className="main-content">
-      <div className="brands-header-section">
-        <div className="header">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-              <h1 className="mb-0">Brands</h1>
-              <p className="text-muted mb-0">Manage your product brands</p>
-            </div>
-            <div className="d-flex gap-2">
-              <Button 
-                variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
-                onClick={() => setViewMode('grid')}
-                size="sm"
-              >
-                <i className="fas fa-th-large me-1"></i>Grid
-              </Button>
-              <Button 
-                variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
-                onClick={() => setViewMode('table')}
-                size="sm"
-              >
-                <i className="fas fa-list me-1"></i>Table
-              </Button>
-              <Button variant="primary" onClick={handleAdd}>
-                <i className="fas fa-plus me-2"></i>Add Brand
-              </Button>
-            </div>
+    <div className="fade-in">
+      <div className="modern-page-header">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h1 className="page-title">Brands</h1>
+            <p className="page-subtitle">Manage your product brands with elegance</p>
+          </div>
+          <div className="d-flex gap-2">
+            <Button 
+              variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
+              onClick={() => setViewMode('grid')}
+              size="sm"
+            >
+              <i className="fas fa-th-large me-1"></i>Grid
+            </Button>
+            <Button 
+              variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
+              onClick={() => setViewMode('table')}
+              size="sm"
+            >
+              <i className="fas fa-list me-1"></i>Table
+            </Button>
+            <Button variant="primary" onClick={handleAdd}>
+              <i className="fas fa-plus me-2"></i>Add Brand
+            </Button>
           </div>
         </div>
-        <div className="search-bar-section mb-3 mt-3">
+      </div>
+
+      <div className="search-section mb-4">
+        <div className="search-box">
+          <i className="fas fa-search search-icon"></i>
           <input
             type="text"
-            className="form-control"
+            className="form-control search-input"
             placeholder="Search Brands by name or description..."
-            // Add search logic if needed
           />
         </div>
       </div>
