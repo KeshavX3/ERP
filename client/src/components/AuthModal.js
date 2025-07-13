@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Button, Alert, Tab, Tabs } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import GoogleAuthButton from './GoogleAuthButton';
 
 const AuthModal = ({ show, onHide, redirectAfterLogin = false, onLoginSuccess }) => {
   const [activeTab, setActiveTab] = useState('login');
@@ -94,6 +95,36 @@ const AuthModal = ({ show, onHide, redirectAfterLogin = false, onLoginSuccess })
     }
   };
 
+  const handleGoogleSuccess = async (googleData) => {
+    setLoading(true);
+    try {
+      // Store the token and user data
+      localStorage.setItem('token', googleData.token);
+      
+      // Update auth context (this will trigger a re-render)
+      // The auth context should handle the token automatically
+      toast.success(`Welcome ${googleData.user.name}! You can now add items to your cart.`);
+      onHide();
+      if (onLoginSuccess) onLoginSuccess();
+      
+      // Refresh the page to update the auth state
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      toast.error('Google authentication failed');
+      setErrors({ submit: 'Google authentication failed' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = (error) => {
+    console.error('Google auth error:', error);
+    toast.error('Google authentication failed');
+    setErrors({ submit: error.message || 'Google authentication failed' });
+  };
+
   const resetForm = () => {
     setLoginData({ email: '', password: '' });
     setSignupData({ name: '', email: '', password: '', confirmPassword: '' });
@@ -155,6 +186,22 @@ const AuthModal = ({ show, onHide, redirectAfterLogin = false, onLoginSuccess })
           >
             <Tab eventKey="login" title="Login">
               <Form onSubmit={handleLogin} className="auth-form">
+                {/* Google Login Button */}
+                <div className="mb-3">
+                  <GoogleAuthButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    buttonText="Sign in with Google"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="divider-container mb-3">
+                  <div className="divider-line"></div>
+                  <span className="divider-text">or</span>
+                  <div className="divider-line"></div>
+                </div>
+
                 <Form.Group className="mb-3">
                   <Form.Label className="auth-label">
                     <i className="fas fa-envelope me-2"></i>
@@ -217,6 +264,22 @@ const AuthModal = ({ show, onHide, redirectAfterLogin = false, onLoginSuccess })
 
             <Tab eventKey="signup" title="Sign Up">
               <Form onSubmit={handleSignup} className="auth-form">
+                {/* Google Sign Up Button */}
+                <div className="mb-3">
+                  <GoogleAuthButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    buttonText="Sign up with Google"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="divider-container mb-3">
+                  <div className="divider-line"></div>
+                  <span className="divider-text">or</span>
+                  <div className="divider-line"></div>
+                </div>
+
                 <Form.Group className="mb-3">
                   <Form.Label className="auth-label">
                     <i className="fas fa-user me-2"></i>

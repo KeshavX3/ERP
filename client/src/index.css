@@ -1275,3 +1275,61 @@ body, html {
   justify-content: center;
   gap: 0.5rem;
 }
+
+.auth-footer-text i {
+  color: #27ae60;
+}
+
+/* === GOOGLE AUTH BUTTON STYLES === */
+.google-auth-btn {
+  border: 2px solid #db4437 !important;
+  color: #db4437 !important;
+  background: white !important;
+  font-weight: 600 !important;
+  padding: 0.8rem 1rem !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.google-auth-btn:hover {
+  background: #db4437 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 15px rgba(219, 68, 55, 0.3) !important;
+}
+
+.google-auth-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* === AUTH DIVIDER STYLES === */
+.divider-container {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+}
+
+.divider-text {
+  margin: 0 1rem;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: white;
+  padding: 0 0.5rem;
+}
+
+/* === GOOGLE AUTH PLACEHOLDER === */
+.google-auth-placeholder {
+  text-align: center;
+}
+
+.google-auth-placeholder .btn {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
